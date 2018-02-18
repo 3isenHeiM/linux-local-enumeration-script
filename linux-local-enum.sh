@@ -444,12 +444,45 @@ printf "$reset"
 # Enumarate CentOS / Ubuntu Boxes 
 # This is not a great way of ID'ing a box, but I'm being lazy
 
+# GNU/Linux distribution identification based on: 
+# https://unix.stackexchange.com/questions/6345/how-can-i-get-distribution-name-and-version-number-in-a-simple-shell-script 
+
+if [ -f /etc/os-release ]; then
+    # freedesktop.org and systemd
+    . /etc/os-release
+    OS=$NAME
+elif type lsb_release >/dev/null 2>&1; then
+    # linuxbase.org
+    OS=$(lsb_release -si)
+elif [ -f /etc/lsb-release ]; then
+    # For some versions of Debian/Ubuntu without lsb_release command
+    . /etc/lsb-release
+    OS=$DISTRIB_ID
+elif [ -f /etc/debian_version ]; then
+    # Older Debian/Ubuntu/etc.
+    OS=Debian
+elif [ -f /etc/SuSe-release ]; then
+    # Older SuSE/etc.
+    OS=SuSE
+elif [ -f /etc/redhat-release ]; then
+    # Older Red Hat, CentOS, etc.
+    OS=CentOS
+else
+    # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
+    OS=$(uname -s)
+fi
 
 printf "\n"
-/usr/bin/dpkg -l
-
-printf "\n"
-/usr/bin/rpm -qa
+if [ $OS == "Debian" ]; then
+    /usr/bin/dpkg -l
+elif [ $OS == "CentOS" || $OS == "RedHat" || $OS == "SuSE" ]; then
+    /usr/bin/rpm -qa
+else
+    # Not identified GNU/Linux distribution
+    printf "$red" 
+    printf "MISSING $OS\n !!"
+    printf "$reset"
+fi
 
 printf "\n"
 printf "$blue"
