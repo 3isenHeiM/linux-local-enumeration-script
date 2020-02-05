@@ -460,13 +460,13 @@ elif [ -f /etc/lsb-release ]; then
     OS=$DISTRIB_ID
 elif [ -f /etc/debian_version ]; then
     # Older Debian/Ubuntu/etc.
-    OS=Debian
+    OS="Debian"
 elif [ -f /etc/SuSe-release ]; then
     # Older SuSE/etc.
-    OS=SuSE
+    OS="SuSE"
 elif [ -f /etc/redhat-release ]; then
     # Older Red Hat, CentOS, etc.
-    OS=CentOS
+    OS="CentOS"
 else
     # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
     OS=$(uname -s)
