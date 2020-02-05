@@ -37,8 +37,8 @@ printf "URL: $green http://highon.coffee $reset \n"
 
 printf "Version: $yellow 1.0 $reset \n"
 
-printf "Twitter: $blue @HighOn_Coffee $reset \n"
-printf "Author: $blue @Arr0way $reset \n"
+printf "Twitter: $blue @HighOn_Coffee $reset & $green @3isenHeiM $reset \n"
+printf "Author: $blue @Arr0way $reset (forked by $green @3isenHeiM$reset) \n"
 
 printf "Disclaimer: \n"
 printf "\n"
@@ -527,6 +527,100 @@ printf "$reset"
 
 
 ls /etc/init.d/
+
+printf "\n"
+printf "$blue"
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' '#'
+printf "##"
+printf "\n"
+printf "$red"
+printf "$blue## $red Device Summary"
+printf "\n"
+printf "$blue"
+printf "##"
+printf "\n"
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' '#'
+printf "\n"
+printf "$reset"
+
+printf "$yellow Hostname:\t$reset"
+hostname
+printf "\n"
+printf "$yellow Uptime:\t$reset"
+w | grep up | awk '{print $1}'
+printf "\n"
+
+printf "$yellow Load:\t\t$reset"
+w | grep -o "average:.*" | cut -d " " -f 2-
+printf "\n"
+
+printf "$yellow Manufacturer:\t$reset"
+cat /sys/class/dmi/id/chassis_vendor
+printf "\n"
+
+printf  "$yellow Product Name:\t$reset"
+cat /sys/class/dmi/id/product_name
+printf "\n"
+
+printf "$yellow Version:\t$reset"
+cat /sys/class/dmi/id/product_version
+printf "\n"
+
+printf "$yellow Serial Number:\t$reset"
+cat /sys/class/dmi/id/product_serial
+printf "\n"
+
+printf "$yellow Machine Type:\t$reset"
+vserver=$(lscpu | grep Hypervisor | wc -l); if [ $vserver -gt 0 ]; then echo "VM"; else echo "Physical"; fi
+printf "\n"
+
+printf "$yellow OS:\t\t$reset"
+hostnamectl | grep "Operating System" | cut -d ' ' -f5-
+printf "\n"
+
+printf "$yellow Kernel:\t$reset"
+uname -r
+printf "\n"
+
+printf "$yellow Architecture:\t$reset"
+arch
+printf "\n"
+
+printf "$yellow Processor:\t$reset"
+awk -F':' '/^model name/ {print $2}' /proc/cpuinfo | uniq | sed -e 's/^[ \t]*//'
+printf "\n"
+
+printf "$yellow Active User:\t$reset"
+w | cut -d ' ' -f1 | grep -v USER | xargs -n1
+printf "\n"
+
+printf "$yellow IP(s):\t$reset"
+hostname -I
+printf "\n"
+
+
+printf "$yellow Total Memory:\t$reset"
+free -m | grep Mem | awk '{print $2,"MB" }'
+printf "\n"
+
+printf "$yellow Memory Usage:\t$reset"
+free | awk '/Mem/{printf("%.2f%"), $3/$2*100}'
+printf "\n"
+
+printf "$yellow Swap Usage:\t$reset"
+free | awk '/Swap/{printf("%.2f%"), $3/$2*100}'
+printf "\n"
+
+printf "$yellow CPU Usage:\t$reset"
+cat /proc/stat | awk '/cpu/{printf("%.2f%\n"), ($2+$4)*100/($2+$4+$5)}' |  awk '{print $0}' | head -1
+printf "\n"
+
+printf "$blue Disk Usage\n$reset"
+df -Ph -x squashfs -x tmpfs -x devtmpfs
+printf "\n"
+
+
+
 
 printf "$blue"
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' '#'
