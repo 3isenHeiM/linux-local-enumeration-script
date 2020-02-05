@@ -432,7 +432,7 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' '#'
 printf "##"
 printf "\n"
 printf "$red"
-printf "$blue## $red Installed Packages for RHEL / Debian Based Systems"
+printf "$blue## $red Installed Packages"
 printf "\n"
 printf "$blue"
 printf "##"
@@ -441,8 +441,6 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' '#'
 printf "\n"
 printf "$reset"
 
-# Enumarate CentOS / Ubuntu Boxes 
-# This is not a great way of ID'ing a box, but I'm being lazy
 
 # GNU/Linux distribution identification based on: 
 # https://unix.stackexchange.com/questions/6345/how-can-i-get-distribution-name-and-version-number-in-a-simple-shell-script 
@@ -473,7 +471,7 @@ else
 fi
 
 printf "\n"
-if [ $OS == "Debian" ]; then
+if [ $OS == "Debian" || $OS == "Ubuntu" ]; then
     /usr/bin/dpkg -l
 elif [ $OS == "CentOS" || $OS == "RedHat" || $OS == "SuSE" ]; then
     /usr/bin/rpm -qa
@@ -490,7 +488,7 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' '#'
 printf "##"
 printf "\n"
 printf "$red"
-printf "$blue## $red CentOS / RHEL Services that start at Boot"
+printf "$blue## $red Services starting at Boot"
 printf "\n"
 printf "$blue"
 printf "##"
@@ -499,7 +497,18 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' '#'
 printf "\n"
 printf "$reset"
 
-chkconfig --list | grep $(runlevel | awk '{ print $2}'):on
+
+if [ $OS == "Debian" || $OS == "Ubuntu" ]; then
+    # From here : https://serverfault.com/a/723592/309985
+    for i in `find /etc/rc*.d -name "S*"`; do basename $i | sed -r 's/^S[0-9]+//'; done | sort | uniq
+elif [ $OS == "CentOS" || $OS == "RedHat" || $OS == "SuSE" ]; then
+    chkconfig --list | grep $(runlevel | awk '{ print $2}'):on
+else
+    # Not identified GNU/Linux distribution
+    printf "$red" 
+    printf "MISSING $OS\n !!"
+    printf "$reset"
+fi
 
 printf "\n"
 printf "$blue"
